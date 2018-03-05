@@ -24,13 +24,12 @@ import java.util.List;
 public class FilmController {
     @Autowired
     FilmDao filmDao;
-    // Ok
-    @RequestMapping(value = "/film")
-    public Film loadFilm(@RequestParam(value="id", defaultValue = "338564") int id)
-    {
-        Film film = filmDao.load(id);
-        return film;
+    @RequestMapping(value= "/films")
+    public List<Film> getFilms() {
+        List<Film> filmList = filmDao.loadAll();
+        return filmList;
     }
+
     // Ok
     @RequestMapping(value= "/films")
     public List<Film> getFilms(
@@ -43,12 +42,6 @@ public class FilmController {
             @RequestParam(value="dureeSup", defaultValue = "1000") int dureeSup
     ) {
         List<Film> filmList = filmDao.loadFilms(input, annee, genres, options, langue, dureeInf, dureeSup);
-        return filmList;
-    }
-
-    @RequestMapping(value= "/films-page")
-    public Page<Film> getFilms(@RequestParam(value="index", defaultValue = "1") int index) {
-        Page<Film> filmList = filmDao.P_loadAll(new PageRequest(index,10));
         return filmList;
     }
 }

@@ -24,107 +24,17 @@ import java.util.*;
 
 @Repository
 @Transactional
-public class FilmDao implements Dao<Film> {
+public class FilmDao {
 
     @Autowired
     private HibernateTemplate hibernateTemplate;
 
-    @Override
-    public void save(Film film) {
-    }
-
-    @Override
-    public Film load(long id) {
-        Film film = this.hibernateTemplate.load(Film.class, id);
-
-        return film;
-    }
-
-    @Override
     public List<Film> loadAll() {
         List<Film> filmList = this.hibernateTemplate.loadAll(Film.class);
         for (Film film : filmList) {
             System.out.println(film.getRealisateurs().size());
         }
         return filmList;
-    }
-
-    @Override
-    public void update(Film film) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void delete(long id) {
-
-    }
-
-    public Film loadFilmWithGenres(long id) {
-        Film film = this.hibernateTemplate.load(Film.class, id);
-        int size = film.getGenres().size();
-
-        return film;
-    }
-
-    public List<Film> loadFilmsWithGenres() {
-        List<Film> films = this.hibernateTemplate.loadAll(Film.class);
-        for (Film film : films) {
-            System.out.println(film.getRealisateurs().size());
-        }
-        return films;
-    }
-
-    public List<Film> loadTitreFilmWhereGenreIs(String genre) {
-        DetachedCriteria criteria = DetachedCriteria.forClass(Film.class);
-        DetachedCriteria genreCriteria = criteria.createCriteria("genres");
-        genreCriteria.add(Restrictions.eq("nom", genre));
-
-//        ProjectionList properties = Projections.projectionList();
-////        properties.add(Projections.property("titre"));
-////        criteria.setProjection(properties);
-
-        List<Film> films = (List<Film>) this.hibernateTemplate.findByCriteria(criteria);
-        films.forEach(film -> System.out.println(film.getGenres().size()));
-
-        return films;
-    }
-
-    public List<Film> loadFilmWhereTitleDate(String title, int date) {
-        DetachedCriteria criteria = DetachedCriteria.forClass(Film.class);
-        Criterion crit1 = Restrictions.and(Restrictions.like("annee", date));
-        Criterion crit2 = Restrictions.and(Restrictions.like("titre", title, MatchMode.ANYWHERE));
-        criteria.add(Restrictions.and(crit1, crit2));
-        List<Film> films = (List<Film>) this.hibernateTemplate.findByCriteria(criteria);
-
-        return films;
-    }
-
-    public Page<Film> P_loadTitreAnneFilmWhereDate(int date, Pageable pageable) {
-        DetachedCriteria criteria = DetachedCriteria.forClass(Film.class);
-        Criterion crit1 = Restrictions.and(Restrictions.like("annee", date));
-        criteria.add(Restrictions.and(crit1));
-        hibernateTemplate.setFetchSize(pageable.getPageNumber() * pageable.getPageSize());
-        hibernateTemplate.setMaxResults(pageable.getPageSize());
-
-        ProjectionList properties = Projections.projectionList();
-        properties.add(Projections.property("titre"));
-        properties.add(Projections.property("annee"));
-
-        criteria.setProjection(properties);
-        List<Film> films = (List<Film>) this.hibernateTemplate.findByCriteria(criteria);
-
-        int totalRows = films.size();
-
-        Page<Film> page = new PageImpl<Film>(films, pageable, totalRows);
-        return page;
-    }
-
-    public Page<Film> P_loadAll(Pageable pageable) {
-        List<Film> filmList = this.hibernateTemplate.loadAll(Film.class);
-        int start = pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > filmList.size() ? filmList.size() : (start + pageable.getPageSize());
-        Page<Film> pages = new PageImpl<Film>(filmList.subList(start, end), pageable, filmList.size());
-        return pages;
     }
 
     /**
